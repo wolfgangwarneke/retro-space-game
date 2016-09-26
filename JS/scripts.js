@@ -171,9 +171,10 @@ function whatKey(evt) {
 
   //print score
   ctx2.clearRect(0, 0, 300, 300);
-  ctx2.font = "20 point Ariel";
-  ctx2.fillText("Score", 20, 15);
-  ctx2.fillText(score, 100, 15);
+  ctx2.fillStyle = "rgb(240,240,20)";
+  ctx2.font = "24px Ariel";
+  ctx2.fillText("Score", 20, 25);
+  ctx2.fillText(score, 100, 25);
 
   collisionTest();
 }

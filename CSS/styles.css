@@ -1,0 +1,30 @@
+body {
+  background-color: rgb(251, 180, 210);
+}
+
+#canvasContainer {
+  background-color: rgb(60,30,90);
+  border-radius: 15px;
+  width: 350px;
+  height: 350px;
+  position: fixed;
+  top: 75px;
+  left: 125px;
+}
+
+#score, #canvas {
+  position: fixed;
+  top: 100px;
+  left: 150px;
+}
+
+#score {
+  z-index: 1;
+}
+
+h1 {
+  font-family: monospace;
+  font-size: 40px;
+  margin-top: 8px;
+  margin-left: 15px;
+}
