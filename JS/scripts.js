@@ -1,3 +1,15 @@
+var shipX = 0;
+var shipY = 0;
+var canvas;
+var ctx;
+var back = new Image();
+var oldBack = new Image();
+var ship = new Image();
+var shipX = 0;
+var shipY = 0;
+var oldShipX = 0;
+var oldShipY = 0;
+
 
 function canvas() {
   canvas = document.getElementById("canvas");
@@ -7,9 +19,15 @@ function canvas() {
     ctx.fillStyle = "black";
     ctx.rect(0, 0, 300, 300);
     ctx.fill();
+
+    back = ctx.getImageData(0, 0, 30, 30);
+
     stars();
     makeShip();
   }
+
+  gameLoop = setInterval(doGameLoop, 16);
+  window.addEventListener('keydown', whatKey, true);
 }
 
 function stars() {
@@ -17,7 +35,7 @@ function stars() {
     var x = Math.floor(Math.random() * 299);
     var y = Math.floor(Math.random() * 299);
     //for randomizing colors
-    var r = Math.floor(Math.random() * (230 - 60) + 60);
+    var r = Math.floor(Math.random() * (180 - 60) + 60);
     //var g = Math.floor(Math.random() * (256 - 100) + 100);
     var b = Math.floor(Math.random() * (256 - 100) + 100);
     ctx.fillStyle = "rgb(" + r + "," + r + "," + b + ")";
@@ -28,11 +46,12 @@ function stars() {
     ctx.arc(x, y, 3, 0, Math.PI*2, true);
     ctx.closePath();
     ctx.fill();
+
+    oldBack = ctx.getImageData(0, 0, 30, 30);
   }
 }
 
 function makeShip() {
-  console.log(123);
   // Draw saucer bottom.
   ctx.beginPath();
   ctx.moveTo(28.4, 16.9);
@@ -54,4 +73,73 @@ function makeShip() {
   ctx.closePath();
   ctx.fillStyle = "rgb(51, 190, 0)";
   ctx.fill();
+
+  // Save ship data
+  ship = ctx.getImageData(0, 0, 30, 30);
+
+  // Erase it for now
+  ctx.putImageData(oldBack, 0, 0);
+}
+
+function doGameLoop() {
+  // old background to erase ship
+  ctx.putImageData(oldBack, oldShipX, oldShipY);
+
+  //ship in new position
+  ctx.putImageData(ship, shipX, shipY);
+}
+
+function whatKey(evt) {
+  //flag to put variables back at edge of makeShip
+  var flag = 0;
+  oldShipX = shipX;
+  oldShipY = shipY;
+  oldBack = back;
+
+  switch (evt.keyCode) {
+    //left
+    case 37:
+      shipX = shipX -30;
+      if (shipX < 0) {
+        //at edge reset ship position and set flag
+        shipX = 0;
+        flag = 1;
+      }
+      break;
+    //right
+    case 39:
+      shipX = shipX += 30;
+      if (shipX > 270) {
+        shipX = 270;
+        flag = 1;
+      }
+      break;
+    //down
+    case 40:
+      shipY = shipY + 30;
+      if (shipY > 270) {
+        shipY = 270;
+        flag = 1;
+      }
+      break;
+    //up
+    case 38:
+      shipY = shipY - 30;
+      if (shipY < 0) {
+        shipY = 270;
+        flag = 1;
+      }
+      break;
+  }
+
+  //if flag, ship can't move so put everything back the way it was
+  if (flag) {
+    shipX = oldShipX;
+    shipY = oldShipY;
+    back = oldBack;
+  } else {
+    //otherwise get background where the ship will go, so you can redraw the backgorund when the ship moves again
+    back = ctx.getImageData(shipX, shipY, 30, 30);
+  }
+
 }
