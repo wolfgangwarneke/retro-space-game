@@ -182,14 +182,29 @@ function collisionTest() {
 
   for (var i = 0; i < clipLength * 4; i += 4) {
     if (whatColor.data[i] == 255) {
-      alert("red");
+      direction = "P";
       break;
     }
     if (whatColor.data[i+2] == 255) {
-      alert("blue");
+      direction = "B";
       break;
     }
   }
+
+  if (direction === "P") damage();
+  if (direction === "B") victory();
+}
+
+function damage() {
+  alert("You're shit has been vaporized.");
+  clearTimeout(gameLoop);
+  window.removeEventListener('keydown', whatKey, true);
+}
+
+function victory() {
+  alert("You made it home kid, good job.");
+  clearTimeout(gameLoop);
+  window.removeEventListener('keydown', whatKey, true);
 }
 
 function drawAsteriods() {
