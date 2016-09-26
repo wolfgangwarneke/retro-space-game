@@ -2,6 +2,8 @@ var shipX = 0;
 var shipY = 0;
 var canvas;
 var ctx;
+var canvas2;
+var ctx2;
 var back = new Image();
 var oldBack = new Image();
 var ship = new Image();
@@ -9,10 +11,17 @@ var shipX = 0;
 var shipY = 0;
 var oldShipX = 0;
 var oldShipY = 0;
+var direction = "R";
+var score = 0;
 
 
 function canvas() {
   canvas = document.getElementById("canvas");
+  canvas2 = document.getElementById("score");
+
+  if (canvas2.getContext) {
+    ctx2 = canvas2.getContext("2d");
+  }
 
   if (canvas.getContext) {
     ctx = canvas.getContext("2d");
@@ -24,6 +33,7 @@ function canvas() {
 
     stars();
     makeShip();
+    drawAsteriods();
   }
 
   gameLoop = setInterval(doGameLoop, 16);
@@ -35,9 +45,9 @@ function stars() {
     var x = Math.floor(Math.random() * 299);
     var y = Math.floor(Math.random() * 299);
     //for randomizing colors
-    var r = Math.floor(Math.random() * (180 - 60) + 60);
+    var r = Math.floor(Math.random() * (150 - 60) + 60);
     //var g = Math.floor(Math.random() * (256 - 100) + 100);
-    var b = Math.floor(Math.random() * (256 - 100) + 100);
+    var b = Math.floor(Math.random() * (200 - 100) + 100);
     ctx.fillStyle = "rgb(" + r + "," + r + "," + b + ")";
 
     if (x < 30 || y < 30) ctx.fillStyle = "black";
@@ -130,6 +140,15 @@ function whatKey(evt) {
         flag = 1;
       }
       break;
+    //'A' key for energy field
+    case 65:
+      score += 20;
+      flag = 1;
+      energyStrike();
+      break;
+    default:
+      flag = 1;
+      alert('Use arrow keys to navigate');
   }
 
   //if flag, ship can't move so put everything back the way it was
@@ -137,9 +156,60 @@ function whatKey(evt) {
     shipX = oldShipX;
     shipY = oldShipY;
     back = oldBack;
+    score --;
   } else {
     //otherwise get background where the ship will go, so you can redraw the backgorund when the ship moves again
     back = ctx.getImageData(shipX, shipY, 30, 30);
   }
 
+  score = score + 1;
+
+  //print score
+  ctx2.clearRect(0, 0, 300, 300);
+  ctx2.font = "20 point Ariel";
+  ctx2.fillText("Score", 20, 15);
+  ctx2.fillText(score, 100, 15);
+
+  collisionTest();
+}
+
+function collisionTest() {
+  var clipWidth = 20;
+  var clipDepth = 20;
+  var clipLength = clipWidth * clipDepth;
+  var clipOffset = 5;
+  var whatColor = ctx.getImageData(shipX + clipOffset, shipY + clipOffset, clipWidth, clipDepth);
+
+  for (var i = 0; i < clipLength * 4; i += 4) {
+    if (whatColor.data[i] == 255) {
+      alert("red");
+      break;
+    }
+    if (whatColor.data[i+2] == 255) {
+      alert("blue");
+      break;
+    }
+  }
+}
+
+function drawAsteriods() {
+  for (i = 0; i <= 20; i++) {
+    //random positions for asteroids
+    var a = Math.floor(Math.random() * 299);
+    var b = Math.floor(Math.random() * 299);
+    ctx.fillStyle = "rgb(255,0,0)";
+    //give asteroids map boundary padding
+    if (a > 40 && b > 40 && a < 270 && b <270) {
+      ctx.beginPath();
+      ctx.arc(a, b, 10, 0, Math.PI * 2, true);
+      ctx.closePath();
+      ctx.fill();
+    } else { --i };
+  }
+
+  ctx.fillStyle = "rgb(0,0,255)";
+  ctx.beginPath();
+  ctx.rect(270,270,30,30);
+  ctx.closePath();
+  ctx.fill();
 }
