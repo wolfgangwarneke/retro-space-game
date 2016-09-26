@@ -7,6 +7,7 @@ var ctx2;
 var back = new Image();
 var oldBack = new Image();
 var ship = new Image();
+var energyField = new Image();
 var shipX = 0;
 var shipY = 0;
 var oldShipX = 0;
@@ -115,6 +116,7 @@ function whatKey(evt) {
         shipX = 0;
         flag = 1;
       }
+      direction = "L";
       break;
     //right
     case 39:
@@ -123,6 +125,7 @@ function whatKey(evt) {
         shipX = 270;
         flag = 1;
       }
+      direction = "R";
       break;
     //down
     case 40:
@@ -131,6 +134,7 @@ function whatKey(evt) {
         shipY = 270;
         flag = 1;
       }
+      direction = "D";
       break;
     //up
     case 38:
@@ -139,6 +143,7 @@ function whatKey(evt) {
         shipY = 270;
         flag = 1;
       }
+      direction = "U";
       break;
     //'A' key for energy field
     case 65:
@@ -196,7 +201,7 @@ function collisionTest() {
 }
 
 function damage() {
-  alert("You're shit has been vaporized.");
+  alert("You're ship has been vaporized.");
   clearTimeout(gameLoop);
   window.removeEventListener('keydown', whatKey, true);
 }
@@ -222,9 +227,42 @@ function drawAsteriods() {
     } else { --i };
   }
 
+  ctx.fillStyle = "rgb(0,255,0)";
+  ctx.beginPath();
+  ctx.rect(270, 270, 30, 30);
+  ctx.closePath();
+  ctx.fill();
+
+  energyField = ctx.getImageData(270, 270, 30, 30);
+
   ctx.fillStyle = "rgb(0,0,255)";
   ctx.beginPath();
   ctx.rect(270,270,30,30);
   ctx.closePath();
   ctx.fill();
+
+  //clearing space around start and end
+  ctx.putImageData(back, 0, 30);
+  ctx.putImageData(back, 0, 30);
+  ctx.putImageData(back, 0, 30);
+  ctx.putImageData(back, 0, 30);
+  ctx.putImageData(back, 0, 30);
+  ctx.putImageData(back, 0, 30);
+}
+
+function energyStrike() {
+  switch (direction) {
+    case "D":
+      ctx.putImageData(energyField, shipX, shipY + 30);
+      break;
+    case "U":
+      ctx.putImageData(energyField, shipX, shipY - 30);
+      break;
+    case "L":
+      ctx.putImageData(energyField, shipX -30, shipY);
+      break;
+    case "R":
+      ctx.putImageData(energyField, shipX + 30, shipY);
+      break;
+  }
 }
